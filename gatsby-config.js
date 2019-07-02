@@ -1,7 +1,7 @@
 module.exports = {
   siteMetadata: {
     title: `Eric's Development Blog`,
-    author: `Eric Do`,
+    author: `Eric`,
     description: `Lessons in Codeland`,
     siteUrl: `https://gatsby-starter-blog-demo.netlify.com/`,
     social: {
