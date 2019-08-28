@@ -1,12 +1,21 @@
 module.exports = {
   siteMetadata: {
-    title: `Eric's Development Blog`,
+    title: `Eric Do`,
+    test: 'A test name',
     author: `Eric`,
     description: `Lessons in Codeland`,
-    siteUrl: `https://gatsby-starter-blog-demo.netlify.com/`,
-    social: {
-      twitter: `ericdo_`,
-    },
+    siteUrl: `https://ericdo.dev/`,
+    social: [
+      {
+        twitter: `ericdo_`,
+        name: "Twitter",
+        url:"https://twitter.com/ericdo_"
+      },
+      {
+        name: "Github",
+        url: "https://github.com/eric-do"
+      }
+    ],
   },
   plugins: [
     {
@@ -74,6 +83,6 @@ module.exports = {
         pathToConfigModule: `src/utils/typography`,
       },
     },
-    'gatsby-plugin-netlify-cms'
+    "gatsby-plugin-netlify-cms",
   ],
 }

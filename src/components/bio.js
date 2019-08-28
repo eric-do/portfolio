@@ -56,6 +56,15 @@ const Bio = () => {
       <p>
        Hi! My name is <strong>{author}</strong>. I’m a software engineer who loves Brazilian Jiu Jitsu, Bicycling, Yoga, and React :)
       </p>
+      {
+        social.map(item => {
+          console.log(item);
+          return (
+          <p key={item.name}>
+            {item.name}
+          </p>
+        )})
+      }
     </div>
   )
 }
