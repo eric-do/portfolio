@@ -4,7 +4,6 @@ title: "Common challenges using Docker"
 comments: true
 date: "2019-09-07"
 ---
-# Common challenges using Docker
 ## docker-compose depends_on
 **Common error messages:** 
 ```
