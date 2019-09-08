@@ -1,28 +1,32 @@
 ---
 layout: post
-title: "Docker deeper dive"
+title: "Common challenges using Docker"
 comments: true
 date: "2019-09-07"
 ---
 # Common challenges using Docker
 ## docker-compose depends_on
-**Common error messages:** econnrefused
+**Common error messages:** 
+```
+econnrefused
+```
+**Clue:** in your logs, you can see your service attempting to connect to your database container, despite your database container still in the process of initialization
 
-A common misconception of *depends_on* is that during a container build, service dependencies will complete their build and initialization before services that depend on them will start. In actuality it's not a "must finish to start" dependency, but rather a "must start to start" dependency.
+A common misconception of *depends_on* is that during your container builds, dependencies will complete their build before services that depend on them will start their respective builds. In actuality, *depends_on* is not a "must finish to start" dependency, but rather a "must start to start" dependency.
 
 From Docker's [own docks](https://docs.docker.com/compose/startup-order/):
 ``
-However, for startup Compose does not wait until a container is “ready” (whatever that means for your particular application) - only until it’s running.
+For startup Compose does not wait until a container is “ready” (whatever that means for your particular application) - only until it’s running.
 ``
 
-This means if you have the expectation that your service will attempt to connect to your DB after your DB has initialized, it will likely attempt to do so prematurely, and fail the connection.
+This means if you have your database container as a dependency of your service container and have the expectation that your service will attempt to connect to your DB only after your DB has finished setup, it will likely attempt to do so prematurely, and fail the connection.
 
 The solution is to find a way to perform checks until dependencies are ready. There are many tools available:
 - [Wait-for-it](https://github.com/vishnubob/wait-for-it)
 - [Dockerize](https://github.com/jwilder/dockerize)
 - [Wait-for](https://github.com/Eficode/wait-for)
 
-Wait-for has a simple implementation for a DB dependency:
+Wait-for has a simple implementation for a DB dependency. You can see in the example code below that the db service will begin first due to *depends_on*. The wait-for script allows the backend service to wait until db is complete before executing the *npm start* command.
 ```yaml
 version: '2'
 
@@ -50,22 +54,22 @@ COMMAND    PID   USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
 mysqld    1785 ericdo   25u  IPv4 0xe2f57dcefcc637e9      0t0  TCP localhost:mysql (LISTEN)
 ```
 
-This means the container is listening to port 3306. 
+This means the MySQL container is listening to port 3306. 
 
-Even if we map a host port 3307 to 3306, e.g.:
+We may map a host port 3307 to 3306, e.g.:
 ```yaml
 PORTS:
  - "3307:3306"
 ```
-**This does not mean the container is listening to port 3307**. 
+**but this does not mean the container is listening to port 3307**. 
 
 When other containers try to access the MySQL DNS, they will still try to access from port 3306, since it is the MySQL default. 
 
-You should expose the container's port 3306, and make sure that incoming requests from port 3306 are mapped to the container's port 3306.
+We should expose the container's port 3306, and make sure that incoming requests from port 3306 are mapped to the container's port 3306.
 
 ```yaml
 PORTS:
- - "3307:3306"
+ - "3306:3306"
 ```
 
 ### Database host name
@@ -90,10 +94,10 @@ database:
     - '3306:3306'
 ```
 
-Your config code likely needs to be updated:
+Your host is not localhost, but rather "database". Your config code needs to be updated:
 ```yaml
   host: "database",
   dialect: "mysql",
 ```
 ## Seeding your database
-https://stackoverflow.com/questions/31210973/how-do-i-seed-a-mongo-database-using-docker-compose
+This StackOverflow [article](https://stackoverflow.com/questions/31210973/how-do-i-seed-a-mongo-database-using-docker-compose) is very detailed and should be used for reference.
