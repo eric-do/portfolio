@@ -13,7 +13,7 @@ econnrefused
 
 A common misconception of *depends_on* is that during your container builds, dependencies will complete their build before services that depend on them will start their respective builds. In actuality, *depends_on* is not a "must finish to start" dependency, but rather a "must start to start" dependency.
 
-From Docker's [own docks](https://docs.docker.com/compose/startup-order/):
+From Docker's [own docs](https://docs.docker.com/compose/startup-order/):
 ``
 For startup Compose does not wait until a container is “ready” (whatever that means for your particular application) - only until it’s running.
 ``
@@ -49,22 +49,21 @@ SequelizeConnectionRefusedError: connect ECONNREFUSED 127.0.0.1:3307
 By default, MySQL runs on port 3306. If you have MySQL running on your local machine, you can see this for yourself:
 ```
 $ sudo lsof -i tcp:3306
+```
+```
 COMMAND    PID   USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
 mysqld    1785 ericdo   25u  IPv4 0xe2f57dcefcc637e9      0t0  TCP localhost:mysql (LISTEN)
 ```
 
-This means the MySQL container is listening to port 3306. 
+This means the MySQL container is running on port 3306. 
 
-We may map a host port 3307 to 3306, e.g.:
+We may currently be mapping a host port 3307 to 3306, e.g.:
 ```yaml
 PORTS:
  - "3307:3306"
 ```
-**but this does not mean the container is listening to port 3307**. 
 
-When other containers try to access the MySQL DNS, they will still try to access from port 3306, since it is the MySQL default. 
-
-We should expose the container's port 3306, and make sure that incoming requests from port 3306 are mapped to the container's port 3306.
+It may be that when other containers try to access the MySQL DNS, they will still try to access using port 3306, since it is the MySQL default. If so, we should consider exposing the container's port 3306, and make sure that incoming requests to port 3306 are correctly mapped.
 
 ```yaml
 PORTS:
